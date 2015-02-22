@@ -1,0 +1,29 @@
+<!--
+  Copyright (c) 2015, <your name>. All rights reserved. Use of this source code
+  is governed by a BSD-style license that can be found in the LICENSE file.
+-->
+
+<!-- import polymer-element's definition -->
+<link rel="import" href="../../packages/polymer/polymer.html">
+
+<link rel="import" href="../../packages/paper_elements/paper_input.html">
+
+<polymer-element name="view-3d">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+<!-- 
+    <paper-input label="Type something..." on-keyup="{{reverseText}}"></paper-input>
+
+    <p>
+      Reversed: {{ reversed }}
+    </p>
+    
+ -->
+    <canvas id="container" ></canvas>
+   </template>
+  <script type="application/dart" src="p3dview.dart"></script>
+</polymer-element>

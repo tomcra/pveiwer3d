@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+
+<!--
+  Copyright (c) 2015, <your name>. All rights reserved. Use of this source code
+  is governed by a BSD-style license that can be found in the LICENSE file.
+-->
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="scaffolded-by" content="https://github.com/google/stagehand">
+  <title>pveiwer3d</title>
+
+  <!-- Add to homescreen for Chrome on Android -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="icon" sizes="192x192" href="images/touch/chrome-touch-icon-192x192.png">
+
+  <!-- Add to homescreen for Safari on iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Web Starter Kit">
+  <link rel="apple-touch-icon-precomposed" href="apple-touch-icon-precomposed.png">
+
+  <!-- Tile icon for Win8 (144x144 + tile color) -->
+  <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
+  <meta name="msapplication-TileColor" content="#3372DF">
+
+  <!-- example of using a paper element -->
+  <link rel="import" href="packages/paper_elements/roboto.html">
+
+  <link rel="import" href="packages/core_elements/core_toolbar.html">
+  <link rel="import" href="packages/core_elements/core_header_panel.html">
+  <link rel="import" href="packages/core_elements/core_icons.html">
+  <link rel="import" href="packages/core_elements/core_menu.html">
+  <link rel="import" href="packages/core_elements/core_menu_button.html">
+  <link rel="import" href="packages/core_elements/core_icon_button.html">
+  <link rel="import" href="packages/core_elements/core_dropdown.html">
+
+  <link rel="import" href="packages/ace_polymer/ace_editor.html">
+
+  <link rel="import" href="packages/paper_elements/paper_menu_button.html">
+  <link rel="import" href="packages/paper_elements/paper_icon_button.html">
+  <link rel="import" href="packages/paper_elements/paper_button.html">
+  <link rel="import" href="packages/paper_elements/paper_item.html">
+  <link rel="import" href="packages/paper_elements/paper_dropdown.html">
+  
+  
+  <!-- example of your own custom element -->
+  <link rel="import" href="packages/pveiwer3d/p3dview.html">
+
+  <link rel="stylesheet" href="styles.css">
+  <style shim-shadowdom>
+
+    paper-button.hover:hover {
+      background: #aaa;
+    }
+
+    paper-icon-button.hover:hover {
+      background: #aaa;
+    }
+    paper-button.blue-ripple::shadow #ripple {
+      color: #4285f4;
+    }
+    paper-button::shadow .button-content {
+      padding: 0.1em 0.1em
+    }
+    paper-button {
+      min-width: 0;
+      border-radius: 0;
+    }
+   
+    paper-menu-button.open-below::core-dropdown {
+      top: 38px;
+    }
+    
+
+  </style>
+  
+</head>
+
+<body fullbleed layout vertical unresolved>
+  <core-header-panel flex>
+    <core-toolbar id="mainheader">
+      <paper-icon-button id="navicon" icon="arrow-back" class="hover"></paper-icon-button>
+      <paper-menu-button class="open-below">
+        <paper-button toggle noink class="hover">Menu</paper-button>
+        <core-dropdown class="dropdown">
+          <core-menu class="menu">
+            <paper-item>Share</paper-item>
+            <paper-item>Settings</paper-item>
+            <paper-item>Help</paper-item>            
+          </core-menu>
+        </core-dropdown>
+      </paper-menu-button> 
+      <span flex></span>
+      <paper-button id="notes">FPS</paper-button>
+      <paper-icon-button id="searchbutton" icon="search" class="hover"></paper-icon-button>
+    </core-toolbar>
+<!--     <ace-editor></ace-editor> -->
+    <view-3d class="content" fit></view-3d>
+  </core-header-panel>
+
+ <script type="application/dart">export 'package:polymer/init.dart';</script>
+<!--   <script type="application/dart" src="pveiwer3d.dart"></script> -->
+</body>
+</html>
