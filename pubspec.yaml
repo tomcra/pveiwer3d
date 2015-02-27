@@ -7,7 +7,7 @@ dependencies:
   ace_polymer: any
   browser: any
   paper_elements: '>=0.6.1 <0.7.0'
-  polymer: '>=0.15.4 <0.16.0'
+  polymer: any
   vector_math: any
 transformers:
 - polymer:

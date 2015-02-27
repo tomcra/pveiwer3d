@@ -63,7 +63,7 @@ class Solar3DApplication {
     skyBox = new Skybox(glContext);
     orbitPath = new OrbitPath(glContext);
     // Measure the canvas element.
-    canvas.width = canvas.parent.client.width;
+    canvas.width = canvas.parent.client.width; //this does not work on the ShadowDOM because there is no parent
     canvas.height = canvas.parent.client.height;
 
     Future f = setupAssets();
