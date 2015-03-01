@@ -64,7 +64,13 @@ class Solar3DApplication {
     grid = new Grid(glContext);
     skyBox = new Skybox(glContext);
     orbitPath = new OrbitPath(glContext);
+<<<<<<< HEAD:lib/view_3d/view_3d.dart
     setSize(width, height);
+=======
+    // Measure the canvas element.
+    canvas.width = canvas.parent.client.width; //this does not work on the ShadowDOM because there is no parent
+    canvas.height = canvas.parent.client.height;
+>>>>>>> origin/master:lib/p3dview.dart
 
     Future f = setupAssets();
     f.then((_) {
