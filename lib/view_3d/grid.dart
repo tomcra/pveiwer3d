@@ -2,7 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-part of p3dview;
+part of view_3d;
 
 class Grid {
   final WebGL.RenderingContext gl;
@@ -10,9 +10,12 @@ class Grid {
   WebGL.Shader vertexShader;
   WebGL.Shader fragmentShader;
   WebGL.Program shaderProgram;
+  Float32List _cameraTransform;
   int numVertices;
 
   Grid(this.gl) {
+    
+    _cameraTransform = new Float32List(16);    
     _generateVertexBuffer();
 
     vertexShader = gl.createShader(WebGL.RenderingContext.VERTEX_SHADER);
@@ -45,6 +48,7 @@ class Grid {
     gl.attachShader(shaderProgram, vertexShader);
     gl.attachShader(shaderProgram, fragmentShader);
     gl.linkProgram(shaderProgram);
+    
   }
 
   void _generateLine(List<double> vertexBuffer, Vector3 b, Vector3 e, Vector4 color) {
@@ -86,33 +90,33 @@ class Grid {
     };
 
     // Bottom
-    var b = new Vector3(0.0, 0.0, -20.0);
+    var b = new Vector3(0.0, 0.0, 20.0);
     var e = new Vector3(0.0, 0.0, 0.0);
     var s = new Vector3(1.0, 0.0, 0.0);
     _generateLines(vertexBufferData, b, e, s, colors['green'], 21);
-    b.setComponents(0.0, 0.0, 0.0);
-    e.setComponents(20.0, 0.0, 0.0);
-    s.setComponents(0.0, 0.0, -1.0);
+    b.setValues(0.0, 0.0, 0.0);
+    e.setValues(20.0, 0.0, 0.0);
+    s.setValues(0.0, 0.0, 1.0);
     _generateLines(vertexBufferData, b, e, s, colors['green'], 21);
 
     // Side
-    b.setComponents(20.0, 0.0, 0.0);
-    e.setComponents(20.0, 20.0, 0.0);
-    s.setComponents(0.0, 0.0, -1.0);
+    b.setValues(20.0, 0.0, 0.0);
+    e.setValues(20.0, 20.0, 0.0);
+    s.setValues(0.0, 0.0, 1.0);
     _generateLines(vertexBufferData, b, e, s, colors['blue'], 21);
-    b.setComponents(20.0, 0.0, 0.0);
-    e.setComponents(20.0, 0.0, -20.0);
-    s.setComponents(0.0, 1.0, 0.0);
+    b.setValues(20.0, 0.0, 0.0);
+    e.setValues(20.0, 0.0, 20.0);
+    s.setValues(0.0, 1.0, 0.0);
     _generateLines(vertexBufferData, b, e, s, colors['blue'], 21);
 
     // Side
-    b.setComponents(0.0, 0.0, -20.0);
-    e.setComponents(0.0, 20.0, -20.0);
-    s.setComponents(1.0, 0.0, 0.0);
+    b.setValues(0.0, 0.0, 20.0);
+    e.setValues(0.0, 20.0, 20.0);
+    s.setValues(1.0, 0.0, 0.0);
     _generateLines(vertexBufferData, b, e, s, colors['red'], 21);
-    b.setComponents(0.0, 0.0, -20.0);
-    e.setComponents(20.0, 0.0, -20.0);
-    s.setComponents(0.0, 1.0, 0.0);
+    b.setValues(0.0, 0.0, 20.0);
+    e.setValues(20.0, 0.0, 20.0);
+    s.setValues(0.0, 1.0, 0.0);
     _generateLines(vertexBufferData, b, e, s, colors['red'], 21);
 
     numVertices = vertexBufferData.length~/7;
@@ -122,7 +126,8 @@ class Grid {
                      WebGL.RenderingContext.STATIC_DRAW);
   }
 
-  void draw(Float32List camera) {
+  void draw(Matrix4 m) {
+    m.copyIntoArray(_cameraTransform);
     gl.enableVertexAttribArray(0);
     gl.enableVertexAttribArray(1);
     gl.bindBuffer(WebGL.RenderingContext.ARRAY_BUFFER, vertexBuffer);
@@ -136,7 +141,7 @@ class Grid {
 
     gl.uniformMatrix4fv(cameraTransformUniformIndex,
                            false,
-                           camera);
+                           _cameraTransform);
     gl.drawArrays(WebGL.RenderingContext.LINES, 0, numVertices);
     gl.flush();
   }

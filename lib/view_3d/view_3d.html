@@ -4,11 +4,11 @@
 -->
 
 <!-- import polymer-element's definition -->
-<link rel="import" href="../../packages/polymer/polymer.html">
+<link rel="import" href="../../../packages/polymer/polymer.html">
 
-<link rel="import" href="../../packages/paper_elements/paper_input.html">
+<link rel="import" href="../../../packages/paper_elements/paper_input.html">
 
-<polymer-element name="view-3d">
+<polymer-element name="view-3d" on-resize="{{doResize}}">
   <template>
     <style>
       :host {
@@ -25,5 +25,5 @@
  -->
     <canvas id="container" ></canvas>
    </template>
-  <script type="application/dart" src="p3dview.dart"></script>
+  <script type="application/dart" src="view_3d.dart"></script>
 </polymer-element>

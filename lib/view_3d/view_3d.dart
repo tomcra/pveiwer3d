@@ -6,7 +6,7 @@
  * A solar system visualization.
  */
 
-library p3dview;
+library view_3d;
 
 import 'dart:async';
 import 'dart:html';
@@ -18,16 +18,16 @@ import 'dart:typed_data';
 import 'package:vector_math/vector_math.dart';
 import 'package:polymer/polymer.dart';
 
-part 'sphere_model_data.dart';
-part 'sphere_model.dart';
-part 'shader.dart';
-part 'planet_shader.dart';
-part 'texture_manager.dart';
-part 'grid.dart';
-part 'camera.dart';
-part 'sphere_controller.dart';
-part 'skybox.dart';
-part 'orbit_path.dart';
+part './sphere_model_data.dart';
+part './sphere_model.dart';
+part './shader.dart';
+part './planet_shader.dart';
+part './texture_manager.dart';
+part './grid.dart';
+part './camera.dart';
+part './sphere_controller.dart';
+part './skybox.dart';
+part './orbit_path.dart';
 
 class Solar3DApplication {
   WebGL.RenderingContext glContext;
@@ -41,6 +41,7 @@ class Solar3DApplication {
   int get height => canvas.height;
   MouseSphereCameraController controller = new MouseSphereCameraController();
   SolarSystem solarSystem;
+  Grid grid;
   OrbitPath orbitPath;
   bool ownMouse = false;
 
@@ -49,8 +50,8 @@ class Solar3DApplication {
     return "${location.substring(0, location.length - "solar.html".length)}";
   }
 
-  void startup(CanvasElement canvasIn) {
-    canvas = canvasIn;
+  void startup(CanvasElement canvas, int width, int height) {
+    this.canvas = canvas;
     glContext = canvas.getContext('experimental-webgl');
     if (glContext == null) {
       canvas.parent.text = ">>> Browser does not support WebGL <<<";
@@ -60,16 +61,16 @@ class Solar3DApplication {
     baseUrl = '${baseUrl}textures/';
     textureManager = new TextureManager(baseUrl, glContext);
     solarSystem = new SolarSystem();
+    grid = new Grid(glContext);
     skyBox = new Skybox(glContext);
     orbitPath = new OrbitPath(glContext);
-    // Measure the canvas element.
-    canvas.width = canvas.parent.client.width;
-    canvas.height = canvas.parent.client.height;
+    setSize(width, height);
 
     Future f = setupAssets();
     f.then((_) {
       bind();
-      camera.aspectRatio = canvas.width / canvas.height;
+      //This should be done in the setSize function not independantly
+      //camera.aspectRatio = canvas.width / canvas.height;
       // Initialize the planets and start the simulation.
       solarSystem.start();
       requestRedraw();
@@ -175,6 +176,7 @@ class Solar3DApplication {
       return;
     }
     controller.accumScroll += event.movement.y;
+    controller.accumDX += event.movement.x;
     event.preventDefault();
   }
 
@@ -187,18 +189,29 @@ class Solar3DApplication {
       WheelEvent e = event;
       controller.mouseSensitivity = 720.0;
       controller.accumDX -= e.deltaX.round();
+      print("deltaX = " + controller.accumDX.toString());
       controller.accumDY += e.deltaY.round();
+      print("deltaY = " + controller.accumDY.toString());
     }
     event.preventDefault();
   }
 
+  /*
+   * TODO: FIXME
+   * The parent does not exist when in shodowDom so this will no longer work
+   */
   void fullscreenChange(Event event) {
     canvas.width = canvas.parent.client.width;
     canvas.height = canvas.parent.client.height;
     camera.aspectRatio = canvas.width / canvas.height;
   }
 
-  void resize(Event event) {
+  /*
+   * TODO: FIXME
+   * The parent does not exist when in shodowDom so this will no longer work
+   * This also never gets hit so it would be worth knowing why
+   */
+  void doResize(Event event) {
     canvas.width = canvas.parent.client.width;
     canvas.height = canvas.parent.client.height;
     camera.aspectRatio = canvas.width / canvas.height;
@@ -213,7 +226,13 @@ class Solar3DApplication {
     document.onMouseMove.listen(mouseMove);
     window.onMouseWheel.listen(mouseWheel);
     document.onFullscreenChange.listen(fullscreenChange);
-    document.onResize.listen(resize);
+    document.onResize.listen(doResize);
+  }
+  
+  void setSize(int width, int height){
+    canvas.width = width;
+    canvas.height = height;
+    camera.aspectRatio = canvas.width / canvas.height;
   }
 
   double renderTime;
@@ -239,16 +258,33 @@ class Solar3DApplication {
      */
     glContext.disable(WebGL.RenderingContext.CULL_FACE);
     glContext.disable(WebGL.RenderingContext.DEPTH_TEST);
+
     textureManager.bind('Sky');
     skyBox.preRender();
     skyBox.render(camera);
+
+    
+    
+    
     /* Prepare to render planets:
      * Enable face culling
      * Enable depth testing
      */
     glContext.enable(WebGL.RenderingContext.CULL_FACE);
     glContext.enable(WebGL.RenderingContext.DEPTH_TEST);
+
+    //This stuff should be elsewhere but this is quick testing
+    /*
+     * TODO: This is what I am working on getting the grid working
+     * it is not working yet.
+     */
+    var projectionMatrix = camera.projectionMatrix;
+    var viewMatrix = camera.lookAtMatrix;
+    projectionMatrix.multiply(viewMatrix);
+    grid.draw(projectionMatrix);
+        
     solarSystem.draw(glContext, controller, camera, time);
+    
     requestRedraw();
   }
 
@@ -547,20 +583,34 @@ void main() {
 /// A Polymer `<view-3d>` element.
 @CustomTag('view-3d')
 class View3d extends PolymerElement {
+  
+  CanvasElement canvas;
+
+  void doResize(Event e){
+    
+    if(canvas != null){
+      application.setSize(this.clientWidth, this.clientHeight - 4);
+    }
+    
+  }
 
   /// Constructor used to create instance of MainApp.
   View3d.created() : super.created(){
-    CanvasElement canvas = shadowRoot.querySelector('#container');
-    
-    application.startup(canvas);
+    canvas = shadowRoot.querySelector('#container');
+    window.onResize.listen(doResize); 
+    application.startup(canvas, this.clientWidth, this.clientHeight - 4);
   }
+  
 
 // Optional lifecycle methods - uncomment if needed.
 
 //  /// Called when an instance of main-app is inserted into the DOM.
-//  attached() {
-//    super.attached();
-//  }
+  attached() {
+    super.attached();
+    this.onResize.listen((e){
+      print(e.currentTarget.innerWidth);
+    });
+  }
 
 //  /// Called when an instance of main-app is removed from the DOM.
 //  detached() {
